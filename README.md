@@ -14,4 +14,3 @@
 | 6  | **Ratih Nawang Wulan**   | 241011400586   |
 
 ---
-# THANK YOUU
