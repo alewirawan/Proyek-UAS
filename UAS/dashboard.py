@@ -5,6 +5,8 @@ def main() :
         print("Selamat Datang Di Aplikasi Pengolahan Data Siswa")
         print("1. Halaman Siswa")
         print("2. Halaman Guru")
+        print("3. Halaman Penilaian")
+        print("4. Halaman Rapor Siswa")
         print("3. KELUAR")
         try :
             pilih = int(input("Silahkan Pilih Menu : "))
