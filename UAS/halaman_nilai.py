@@ -24,20 +24,46 @@ def create_table():
 def add_record():
     conn = create_connection()
     cursor = conn.cursor()
-    
-    # Input data dari pengguna
     try:
-        nama = input("Masukkan nama siswa: ")
-        nisn = int(input("Masukkan NISN siswa: "))
+        # Validasi input nama
+        while True:
+            nama = input("Masukkan nama siswa: ")
+            if nama.strip() == "":
+                print("Nama tidak boleh kosong. Silakan coba lagi.")
+            else:
+                break
+
+        # Validasi input NISN
+        while True:
+            try:
+                nisn = int(input("Masukkan NISN: "))
+                cursor.execute("SELECT COUNT(*) FROM siswa WHERE nisn = ?", (nisn,))
+                if cursor.fetchone()[0] > 0:
+                    print("NISN sudah terdaftar. Anda dapat melanjutkan.")
+                    break
+                else:
+                    print("NISN tidak terdaftar, coba lagi.")
+            except ValueError:
+                print("NISN harus berupa angka. Silakan coba lagi.")
+
+        # Input mata pelajaran
         mapel = input("Masukkan mata pelajaran: ")
-        nilai = float(input("Masukkan nilai siswa: "))
+
+        while True:
+            try:
+                nilai = float(input("Masukkan nilai siswa: "))
+                if 0 <= nilai <= 100:
+                    break
+                else:
+                    print("Nilai harus antara 0 dan 100. Silakan coba lagi.")
+            except ValueError:
+                print("Nilai harus berupa angka desimal. Silakan coba lagi.")
 
         cursor.execute("INSERT INTO penilaian (nama, nisn, mapel, nilai) VALUES (?, ?, ?, ?)",
                        (nama, nisn, mapel, nilai))
         conn.commit()
         print("Data berhasil ditambahkan.")
-    except ValueError:
-        print("Input salah. Pastikan NISN berupa angka dan nilai berupa angka desimal.")
+
     except sqlite3.IntegrityError as e:
         print(f"Error: {e}")
     finally:
