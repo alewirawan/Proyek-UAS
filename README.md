@@ -25,4 +25,7 @@ halama dasboar
 | 6  | **Ratih Nawang Wulan**   | 241011400586   |
 
 ---
+<<<<<<< HEAD
 >>>>>>> 47efae99e2d447aff3958d2aa5604e7a33730ade
+=======
+>>>>>>> 2ea0f51fe4bb16bf0b4a6f1f329326fb35cb256a
