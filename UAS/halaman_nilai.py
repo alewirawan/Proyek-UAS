@@ -16,7 +16,7 @@ conn.commit()
 
 # Fungsi untuk menambahkan penilaian (Create)
 def tambah_penilaian():
-    id_siswa = input("Masukkan ID Siswa: ")
+    id_siswa = input("Masukkan nisn Siswa: ")
     nama = input("Masukkan Nama Siswa: ")
     try:
         nilai = float(input("Masukkan Nilai Siswa: "))
