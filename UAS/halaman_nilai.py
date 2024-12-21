@@ -11,7 +11,6 @@ def create_table():
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS penilaian (
         no INTEGER PRIMARY KEY AUTOINCREMENT,
-        nama VARCHAR(40) NOT NULL,
         nisn INTEGER NOT NULL UNIQUE,
         mapel TEXT NOT NULL,
         nilai REAL NOT NULL CHECK(nilai >= 0 AND nilai <= 100)
@@ -25,14 +24,6 @@ def add_record():
     conn = create_connection()
     cursor = conn.cursor()
     try:
-        # Validasi input nama
-        while True:
-            nama = input("Masukkan nama siswa: ")
-            if nama.strip() == "":
-                print("Nama tidak boleh kosong. Silakan coba lagi.")
-            else:
-                break
-
         # Validasi input NISN
         while True:
             try:
@@ -59,8 +50,8 @@ def add_record():
             except ValueError:
                 print("Nilai harus berupa angka desimal. Silakan coba lagi.")
 
-        cursor.execute("INSERT INTO penilaian (nama, nisn, mapel, nilai) VALUES (?, ?, ?, ?)",
-                       (nama, nisn, mapel, nilai))
+        cursor.execute("INSERT INTO penilaian ( nisn, mapel, nilai) VALUES (?, ?, ?, ?)",
+                       ( nisn, mapel, nilai))
         conn.commit()
         print("Data berhasil ditambahkan.")
 
