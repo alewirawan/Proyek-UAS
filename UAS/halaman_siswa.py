@@ -2,7 +2,7 @@ import sqlite3
 from datetime import datetime
 from validasi import validasi_tanggal, validasi_angkatan
 
-def tambah_siswa():
+def tambah_siswa() :
     conn = sqlite3.connect('UAS.db')
     cursor = conn.cursor()
     
@@ -79,7 +79,7 @@ def lihat_siswa() :
 
     conn.close()
 
-def halaman_siswa() :
+def menu_siswa() :
     conn = sqlite3.connect('UAS.db')
     cursor = conn.cursor()
     

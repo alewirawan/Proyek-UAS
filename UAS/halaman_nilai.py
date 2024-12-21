@@ -144,7 +144,7 @@ def delete_record():
         conn.close()
 
 # Menu utama
-def main():
+def menu_nilai():
     create_table()
     while True:
         print("\nMenu Penilaian Siswa:")
@@ -171,4 +171,4 @@ def main():
 
 # Jalankan program
 if __name__ == "__main__":
-    main()
+    menu_nilai()
