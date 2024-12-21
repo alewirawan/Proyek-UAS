@@ -28,6 +28,6 @@ def main() :
             else :
                 print("Pilihan tidak valid. Coba lagi !")
         except ValueError :
-            print("Input harus berupa angka !1")
+            print("Input harus berupa angka !")
 
 main()
