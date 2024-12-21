@@ -27,3 +27,50 @@ def validasi_angkatan(angkatan_input):
     except ValueError as e:
         print(e)
         return None
+
+def nisn_ai(cursor) :
+    cursor.execute("SELECT MAX(id) FROM siswa")
+    last_id = cursor.fetchone()[0]
+    
+    if last_id is None :
+        last_id = 0
+    
+    nisn_auto = "241011"+ f"{last_id+1 :06d}"
+    nisn = int(nisn_auto)
+    return nisn
+
+def validasi_input(cursor) :
+    while True :
+        nama_siswa = input("Masukkan Nama Siswa : ").strip().upper()
+        if not nama_siswa :
+            print("Nama Siswa Tidak Boleh Kosong !\n")
+            continue        
+        cursor.execute("SELECT COUNT(*) FROM siswa WHERE nama = ?", (nama_siswa,))
+        if cursor.fetchone()[0] > 0 :
+            print("Nama Sudah Terdaftar !")
+        else :
+            break
+    
+    while True :
+        jk = input("Masukkan Jenis Kelamin (L/P) : ").upper()
+        if jk not in ["L", "P"]:
+            print("INPUT HARUS L ATAU P SAJA!")
+        else :
+            jk = 'Laki-Laki' if jk == "L" else 'Perempuan'
+            break
+    
+    while True :
+        tanggal_lahir_input = input("Masukkan Tanggal Lahir (YYYY/MM/DD) : ")
+        tanggal_lahir = validasi_tanggal(tanggal_lahir_input)
+        
+        if tanggal_lahir :
+            break
+            
+    while True :
+        angkatan_input = input("Masukkan Angkatan (tahun) : ")
+        angkatan = validasi_angkatan(angkatan_input)
+        
+        if angkatan is not None:
+            break
+
+    return nama_siswa, jk, tanggal_lahir, angkatan
