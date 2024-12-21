@@ -34,12 +34,13 @@ def tambah_nilai():
                     print("NISN sudah terdaftar. Anda dapat melanjutkan.")
                     break
                 else:
+                    
                     print("NISN tidak terdaftar, coba lagi.")
             except ValueError:
                 print("NISN harus berupa angka. Silakan coba lagi.")
 
         # Input mata pelajaran
-        mapel = input("Masukkan mata pelajaran: ")
+        mapel = input("Masukkan mata pelajaran: ").strip()
 
         while True:
             try:
@@ -51,8 +52,8 @@ def tambah_nilai():
             except ValueError:
                 print("Nilai harus berupa angka desimal. Silakan coba lagi.")
 
-        cursor.execute("INSERT INTO penilaian (nama, nisn, mapel, nilai) VALUES (?, ?, ?, ?)",
-                       (nama, nisn, mapel, nilai))
+        cursor.execute("INSERT INTO penilaian (nisn, mapel, nilai) VALUES (?, ?, ?)",
+                    (nisn, mapel, nilai))
         conn.commit()
         print("Data berhasil ditambahkan.")
 
@@ -72,7 +73,7 @@ def lihat_nilai():
     print("\nData Penilaian Siswa:\n")
     print("="*20)
     if rows:
-        headers = ["No", "Nama", "NISN", "Mapel", "Nilai"]
+        headers = ["No", "NISN", "Mapel", "Nilai"]
         print(tabulate(rows, headers=headers, tablefmt="grid"))
     else:
         print("Data nilai siswa belum ditambahkan!\n")
@@ -85,9 +86,6 @@ def update_nilai():
     try:
         no = int(input("Masukkan No siswa yang ingin diperbarui: "))
         print("Isi data yang ingin diperbarui (tekan Enter untuk melewati):")
-        nama = input("Nama baru: ").strip() or None
-        nisn = input("NISN baru: ").strip()
-        nisn = int(nisn) if nisn else None
         mapel = input("Mata pelajaran baru: ").strip() or None
         nilai = input("Nilai baru: ").strip()
         nilai = float(nilai) if nilai else None
@@ -120,7 +118,7 @@ def hapus_nilai():
     cursor = conn.cursor()
 
     try:
-        no = int(input("Masukkan NISN siswa yang ingin dihapus: "))
+        no = int(input("Masukkan No siswa yang ingin dihapus: "))
         cursor.execute("DELETE FROM penilaian WHERE no = ?", (no,))
         conn.commit()
         print("Data berhasil dihapus.")
@@ -154,3 +152,4 @@ def menu_nilai():
             break
         else:
             print("Pilihan tidak valid. Silakan coba lagi.")
+
