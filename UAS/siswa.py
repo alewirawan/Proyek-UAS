@@ -1,6 +1,6 @@
 import sqlite3
 from datetime import datetime
-from back import validasi_tanggal, validasi_angkatan
+from validasi import validasi_tanggal, validasi_angkatan
 
 def tambah_siswa():
     conn = sqlite3.connect('UAS.db')
