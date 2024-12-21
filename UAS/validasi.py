@@ -27,3 +27,14 @@ def validasi_angkatan(angkatan_input):
     except ValueError as e:
         print(e)
         return None
+
+def nisn_ai(cursor) :
+    cursor.execute("SELECT MAX(id) FROM siswa")
+    last_id = cursor.fetchone()[0]
+    
+    if last_id is None :
+        last_id = 0
+    
+    nisn_auto = "241011"+ f"{last_id+1 :06d}"
+    nisn = int(nisn_auto)
+    return nisn

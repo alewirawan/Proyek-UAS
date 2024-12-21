@@ -1,6 +1,6 @@
 import sqlite3
 from datetime import datetime
-from validasi import validasi_tanggal, validasi_angkatan
+from validasi import validasi_tanggal, validasi_angkatan, nisn_ai
 
 def tambah_siswa() :
     conn = sqlite3.connect('UAS.db')
@@ -9,22 +9,14 @@ def tambah_siswa() :
     print("\nSelamat Datang Di Menu Input")
     while True :
         nama_siswa = input("Masukkan Nama Siswa : ").strip().upper()
+        if not nama_siswa :
+            print("Nama Siswa Tidak Boleh Kosong !\n")
+            continue        
         cursor.execute("SELECT COUNT(*) FROM siswa WHERE nama = ?", (nama_siswa,))
         if cursor.fetchone()[0] > 0 :
             print("Nama Sudah Terdaftar !")
         else :
             break
-    
-    while True :
-        try :
-            nisn = int(input("Masukkan NISN : "))
-            cursor.execute("SELECT COUNT(*) FROM siswa WHERE nisn = ?", (nisn,))
-            if cursor.fetchone()[0] > 0:
-                print("NISN Sudah Terdaftar !")
-            else :
-                break
-        except ValueError :
-            print("NISN Harus Berupa Angka !")
     
     while True :
         jk = input("Masukkan Jenis Kelamin (L/P) : ").upper()
@@ -47,6 +39,8 @@ def tambah_siswa() :
         
         if angkatan is not None:
             break
+    
+    nisn = nisn_ai(cursor)
     
     cursor.execute(
         "INSERT INTO siswa (nama, nisn, jenis_kelamin, tanggal_lahir, angkatan) VALUES (?, ?, ?, ?, ?)", 
