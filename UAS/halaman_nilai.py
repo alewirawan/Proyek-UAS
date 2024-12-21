@@ -50,7 +50,7 @@ def add_record():
             except ValueError:
                 print("Nilai harus berupa angka desimal. Silakan coba lagi.")
 
-        cursor.execute("INSERT INTO penilaian ( nisn, mapel, nilai) VALUES (?, ?, ?, ?)",
+        cursor.execute("INSERT INTO penilaian (nisn, mapel, nilai) VALUES (?, ?, ?)",
                        ( nisn, mapel, nilai))
         conn.commit()
         print("Data berhasil ditambahkan.")
@@ -93,12 +93,6 @@ def update_record():
 
         query = "UPDATE penilaian SET "
         params = []
-        if nama:
-            query += "nama = ?, "
-            params.append(nama)
-        if nisn:
-            query += "nisn = ?, "
-            params.append(nisn)
         if mapel:
             query += "mapel = ?, "
             params.append(mapel)
@@ -125,7 +119,7 @@ def delete_record():
     cursor = conn.cursor()
 
     try:
-        no = int(input("Masukkan No siswa yang ingin dihapus: "))
+        no = int(input("Masukkan NISN siswa yang ingin dihapus: "))
         cursor.execute("DELETE FROM penilaian WHERE no = ?", (no,))
         conn.commit()
         print("Data berhasil dihapus.")
