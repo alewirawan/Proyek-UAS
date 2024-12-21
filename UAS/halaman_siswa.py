@@ -1,6 +1,7 @@
 import sqlite3
 from datetime import datetime
 from validasi import validasi_tanggal, validasi_angkatan, nisn_ai
+from tabulate import tabulate
 
 def tambah_siswa() :
     conn = sqlite3.connect('UAS.db')
@@ -57,17 +58,17 @@ def lihat_siswa() :
     cursor.execute("SELECT * FROM siswa")
     rows = cursor.fetchall()
 
-    if rows :
-        print("="*120)
-        print(f"{'ID':<5} {'Nama':<40} {'NISN':<15} {'Jenis Kelamin':<15} {'Tanggal Lahir':<20} {'Angkatan':<6}")
-        print("="*120)
+    if rows:
+        headers = ['ID', 'Nama', 'NISN', 'Jenis Kelamin', 'Tanggal Lahir', 'Angkatan']
         
+        formatted_rows = []
         for row in rows:
             tanggal_lahir = row[4]
             tanggal_obj = datetime.strptime(tanggal_lahir, '%Y-%m-%d')
             tanggal_formatted = tanggal_obj.strftime('%d %B %Y')
+            formatted_rows.append([row[0], row[1], row[2], row[3], tanggal_formatted, row[5]])
 
-            print(f"{row[0]:<5} {row[1]:<40} {row[2]:<15} {row[3]:<15} {tanggal_formatted:<20} {row[5]:<6}")
+        print(tabulate(formatted_rows, headers=headers, tablefmt="grid"))
     else:
         print("Data Siswa Belum Ditambahkan!")
 

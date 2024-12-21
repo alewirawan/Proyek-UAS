@@ -1,4 +1,5 @@
 import sqlite3
+from tabulate import tabulate
 
 # Fungsi untuk membuat koneksi ke database
 def create_connection():
@@ -21,7 +22,7 @@ def create_table():
     conn.close()
 
 # Fungsi untuk menambahkan data
-def add_record():
+def tambah_nilai():
     conn = create_connection()
     cursor = conn.cursor()
     try:
@@ -60,7 +61,7 @@ def add_record():
                 print("Nilai harus berupa angka desimal. Silakan coba lagi.")
 
         cursor.execute("INSERT INTO penilaian (nama, nisn, mapel, nilai) VALUES (?, ?, ?, ?)",
-                       (nama, nisn, mapel, nilai))
+                    (nama, nisn, mapel, nilai))
         conn.commit()
         print("Data berhasil ditambahkan.")
 
@@ -70,23 +71,23 @@ def add_record():
         conn.close()
 
 # Fungsi untuk membaca data
-def read_records():
+def lihat_nilai():
     conn = create_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM penilaian")
     rows = cursor.fetchall()
     conn.close()
-
-    print("\nData Penilaian Siswa:")
-    print("-" * 40)
-    print(f"{'No':<5} {'Nama':<20} {'NISN':<10} {'Mapel':<15} {'Nilai':<5}")
-    print("-" * 40)
-    for row in rows:
-        print(f"{row[0]:<5} {row[1]:<20} {row[2]:<10} {row[3]:<15} {row[4]:<5}")
-    print("-" * 40)
+    print("="*20)
+    print("\nData Penilaian Siswa:\n")
+    print("="*20)
+    if rows:
+        headers = ["No", "Nama", "NISN", "Mapel", "Nilai"]
+        print(tabulate(rows, headers=headers, tablefmt="grid"))
+    else:
+        print("Data nilai siswa belum ditambahkan!\n")
 
 # Fungsi untuk memperbarui data
-def update_record():
+def update_nilai():
     conn = create_connection()
     cursor = conn.cursor()
 
@@ -129,7 +130,7 @@ def update_record():
         conn.close()
 
 # Fungsi untuk menghapus data
-def delete_record():
+def hapus_nilai():
     conn = create_connection()
     cursor = conn.cursor()
 
@@ -156,19 +157,15 @@ def menu_nilai():
         
         choice = input("Pilih menu (1-5): ")
         if choice == "1":
-            add_record()
+            tambah_nilai()
         elif choice == "2":
-            read_records()
+            lihat_nilai()
         elif choice == "3":
-            update_record()
+            update_nilai()
         elif choice == "4":
-            delete_record()
+            hapus_nilai()
         elif choice == "5":
             print("Keluar dari program. Sampai jumpa!")
             break
         else:
             print("Pilihan tidak valid. Silakan coba lagi.")
-
-# Jalankan program
-if __name__ == "__main__":
-    menu_nilai()
