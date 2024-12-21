@@ -12,7 +12,6 @@ def create_table():
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS penilaian (
         no INTEGER PRIMARY KEY AUTOINCREMENT,
-        nama VARCHAR(40) NOT NULL,
         nisn INTEGER NOT NULL UNIQUE,
         mapel TEXT NOT NULL,
         nilai REAL NOT NULL CHECK(nilai >= 0 AND nilai <= 100)
@@ -26,14 +25,6 @@ def tambah_nilai():
     conn = create_connection()
     cursor = conn.cursor()
     try:
-        # Validasi input nama
-        while True:
-            nama = input("Masukkan nama siswa: ")
-            if nama.strip() == "":
-                print("Nama tidak boleh kosong. Silakan coba lagi.")
-            else:
-                break
-
         # Validasi input NISN
         while True:
             try:
@@ -61,7 +52,7 @@ def tambah_nilai():
                 print("Nilai harus berupa angka desimal. Silakan coba lagi.")
 
         cursor.execute("INSERT INTO penilaian (nama, nisn, mapel, nilai) VALUES (?, ?, ?, ?)",
-                    (nama, nisn, mapel, nilai))
+                       (nama, nisn, mapel, nilai))
         conn.commit()
         print("Data berhasil ditambahkan.")
 
@@ -103,12 +94,6 @@ def update_nilai():
 
         query = "UPDATE penilaian SET "
         params = []
-        if nama:
-            query += "nama = ?, "
-            params.append(nama)
-        if nisn:
-            query += "nisn = ?, "
-            params.append(nisn)
         if mapel:
             query += "mapel = ?, "
             params.append(mapel)
@@ -135,7 +120,7 @@ def hapus_nilai():
     cursor = conn.cursor()
 
     try:
-        no = int(input("Masukkan No siswa yang ingin dihapus: "))
+        no = int(input("Masukkan NISN siswa yang ingin dihapus: "))
         cursor.execute("DELETE FROM penilaian WHERE no = ?", (no,))
         conn.commit()
         print("Data berhasil dihapus.")

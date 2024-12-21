@@ -2,6 +2,7 @@ from halaman_siswa import menu_siswa
 from halaman_nilai import menu_nilai
 from halaman_guru import menu_guru
 
+
 def main() :
     while True :
         print("Selamat Datang Di Aplikasi Pengolahan Data Siswa")

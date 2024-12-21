@@ -1,45 +1,13 @@
 import sqlite3
 from datetime import datetime
 from validasi import validasi_tanggal, validasi_angkatan, nisn_ai
-from tabulate import tabulate
 
 def tambah_siswa() :
     conn = sqlite3.connect('UAS.db')
     cursor = conn.cursor()
     
     print("\nSelamat Datang Di Menu Input")
-    while True :
-        nama_siswa = input("Masukkan Nama Siswa : ").strip().upper()
-        if not nama_siswa :
-            print("Nama Siswa Tidak Boleh Kosong !\n")
-            continue        
-        cursor.execute("SELECT COUNT(*) FROM siswa WHERE nama = ?", (nama_siswa,))
-        if cursor.fetchone()[0] > 0 :
-            print("Nama Sudah Terdaftar !")
-        else :
-            break
-    
-    while True :
-        jk = input("Masukkan Jenis Kelamin (L/P) : ").upper()
-        if jk not in ["L", "P"]:
-            print("INPUT HARUS L ATAU P SAJA!")
-        else :
-            jk = 'Laki-Laki' if jk == "L" else 'Perempuan'
-            break
-    
-    while True :
-        tanggal_lahir_input = input("Masukkan Tanggal Lahir (YYYY/MM/DD) : ")
-        tanggal_lahir = validasi_tanggal(tanggal_lahir_input)
-        
-        if tanggal_lahir :
-            break
-            
-    while True :
-        angkatan_input = input("Masukkan Angkatan (tahun) : ")
-        angkatan = validasi_angkatan(angkatan_input)
-        
-        if angkatan is not None:
-            break
+    nama_siswa, jk, tanggal_lahir, angkatan = validasi_input(cursor)
     
     nisn = nisn_ai(cursor)
     
@@ -74,6 +42,75 @@ def lihat_siswa() :
 
     conn.close()
 
+def edit_siswa() :
+    conn = sqlite3.connect('UAS.db')
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT * FROM siswa")
+    rows = cursor.fetchall()
+    
+    if not rows :
+        print("Data Masih Kosong !")
+    else :
+        try :
+            id_siswa = int(input("Masukkan ID Siswa yang Ingin Di Edit : "))
+            if id_siswa == 0 :
+                print("Range Angka Harus Diatas 0 !")
+        except ValueError : 
+            print("Input Harus Berupa Angka !")
+        print("Data Sebelum Pembaruan : ")
+        cursor.execute("SELECT * FROM siswa WHERE id = ?", (id_siswa,))
+        row = cursor.fetchone()
+        if row :
+            print(row)
+        else :
+            print("ID Siswa Tidak Ada !")
+        print("Masukkan Update Data : ")
+        nama_siswa, jk, tanggal_lahir, angkatan = validasi_input(cursor)
+        cursor.execute("""
+                       UPDATE siswa
+                       SET nama = ?, jenis_kelamin = ?, tanggal_lahir = ?, angkatan = ? 
+                       WHERE id = ?""", (nama_siswa, jk, tanggal_lahir, angkatan, id_siswa))
+        conn.commit()
+        print("Data Setelah Pembaruan : ")
+        cursor.execute("SELECT * FROM siswa WHERE id = ?", (id_siswa,))
+        row = cursor.fetchone()
+        print(row)
+        conn.close()
+
+def hapus_siswa() :
+    conn = sqlite3.connect('UAS.db')
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT * FROM siswa")
+    rows = cursor.fetchall()
+    
+    if not rows :
+        print("Data Masih Kosong !")
+    else :
+        try :
+            id_siswa = int(input("Masukkan ID Siswa yang Ingin Di Hapus : "))
+            if id_siswa == 0 :
+                print("Range Angka Harus Diatas 0 !")
+        except ValueError : 
+            print("Input Harus Berupa Angka !")
+        print("Data Sebelum Penghapusan : ")
+        cursor.execute("SELECT * FROM siswa WHERE id = ?", (id_siswa,))
+        row = cursor.fetchone()
+        if row :
+            print(row)
+        else :
+            print("ID Siswa Tidak Ada !")
+        
+        cursor.execute("DELETE FROM siswa WHERE id = ?", (id_siswa,))    
+        conn.commit()
+        print("Data Setelah Penghapusan : ")
+        cursor.execute("SELECT * FROM siswa")
+        rows = cursor.fetchall()
+        for row in rows :
+            print(row)
+        conn.close()
+
 def menu_siswa() :
     conn = sqlite3.connect('UAS.db')
     cursor = conn.cursor()
@@ -92,11 +129,11 @@ def menu_siswa() :
 
     while True :
         print("\nSelamat Datang Di Menu Halaman Siswa")
-        print("="*30)
         print("1. Tambah Data Siswa")
         print("2. Lihat Data Siswa")
-        print("3. Kembali Ke Menu Utama")
-        print("="*30)
+        print("3. Update Data Siswa")
+        print("4. Hapus Data Siswa")
+        print("0. Kembali Ke Menu Utama")
         try :
             pilih = int(input("Silakan Pilih Menu : "))
             if pilih == 1 :
@@ -104,9 +141,13 @@ def menu_siswa() :
             elif pilih == 2 :
                 lihat_siswa()
             elif pilih == 3 :
+                edit_siswa()
+            elif pilih == 4 :
+                hapus_siswa()
+            elif pilih == 0 :
                 print("")
                 break
             else :
-                print("Pilihan Tidak Valid !")
+                print("Pilihan Tidak Valid!")
         except ValueError:
-            print("Input Harus Berupa Angka !")
+            print("Input Harus Berupa Angka!")
