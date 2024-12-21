@@ -77,7 +77,40 @@ def edit_siswa() :
         row = cursor.fetchone()
         print(row)
         conn.close()
+
+def hapus_siswa() :
+    conn = sqlite3.connect('UAS.db')
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT * FROM siswa")
+    rows = cursor.fetchall()
+    
+    if not rows :
+        print("Data Masih Kosong !")
+    else :
+        try :
+            id_siswa = int(input("Masukkan ID Siswa yang Ingin Di Hapus : "))
+            if id_siswa == 0 :
+                print("Range Angka Harus Diatas 0 !")
+        except ValueError : 
+            print("Input Harus Berupa Angka !")
+        print("Data Sebelum Penghapusan : ")
+        cursor.execute("SELECT * FROM siswa WHERE id = ?", (id_siswa,))
+        row = cursor.fetchone()
+        if row :
+            print(row)
+        else :
+            print("ID Siswa Tidak Ada !")
         
+        cursor.execute("DELETE FROM siswa WHERE id = ?", (id_siswa,))    
+        conn.commit()
+        print("Data Setelah Penghapusan : ")
+        cursor.execute("SELECT * FROM siswa")
+        rows = cursor.fetchall()
+        for row in rows :
+            print(row)
+        conn.close()
+
 def menu_siswa() :
     conn = sqlite3.connect('UAS.db')
     cursor = conn.cursor()
@@ -99,7 +132,8 @@ def menu_siswa() :
         print("1. Tambah Data Siswa")
         print("2. Lihat Data Siswa")
         print("3. Update Data Siswa")
-        print("4. Kembali Ke Menu Utama")
+        print("4. Hapus Data Siswa")
+        print("0. Kembali Ke Menu Utama")
         try :
             pilih = int(input("Silakan Pilih Menu : "))
             if pilih == 1 :
@@ -109,6 +143,8 @@ def menu_siswa() :
             elif pilih == 3 :
                 edit_siswa()
             elif pilih == 4 :
+                hapus_siswa()
+            elif pilih == 0 :
                 print("")
                 break
             else :
