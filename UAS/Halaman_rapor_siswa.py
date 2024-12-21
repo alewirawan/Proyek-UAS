@@ -11,42 +11,42 @@ def display_students():
     cursor = conn.cursor()
 
     # Mengambil semua data siswa
-    cursor.execute("SELECT id, name, class FROM students")
-    students = cursor.fetchall()
+    cursor.execute("SELECT id, nama, nisn FROM siswa")
+    siswa = cursor.fetchall()
 
     conn.close()
 
     print("\n=== Daftar Siswa ===")
-    for student in students:
-        print(f"{student[0]}. {student[1]} (Kelas: {student[2]})")
+    for s in siswa:
+        print(f"{s[0]}. {s[1]} (NISN: {s[2]})")
 
-    return students
+    return siswa
 
-def view_student_scores(student_id):
-    """Menampilkan nilai siswa berdasarkan ID."""
+def view_student_scores(nisn):
+    """Menampilkan nilai siswa berdasarkan NISN."""
     conn = connect_database()
     cursor = conn.cursor()
 
     # Mengambil detail siswa
-    cursor.execute("SELECT name, class FROM students WHERE id = ?", (student_id,))
+    cursor.execute("SELECT nama, nisn FROM siswa WHERE nisn = ?", (nisn,))
     student = cursor.fetchone()
     
     if not student:
         print("Siswa tidak ditemukan.")
         return
 
-    name, student_class = student
+    nama, nisn = student
 
     # Mengambil nilai siswa
-    cursor.execute("SELECT subject, score FROM scores WHERE student_id = ?", (student_id,))
+    cursor.execute("SELECT mapel, nilai FROM penilaian WHERE nisn = ?", (nisn,))
     scores = cursor.fetchall()
 
     conn.close()
 
     # Menampilkan nilai siswa
     print("\n=== Laporan Nilai ===")
-    print(f"Nama        : {name}")
-    print(f"Kelas       : {student_class}")
+    print(f"Nama        : {nama}")
+    print(f"NISN        : {nisn}")
     print("\nMata Pelajaran dan Nilai:")
     print("-------------------------")
 
@@ -65,18 +65,18 @@ if __name__ == "__main__":
     print("=== Sistem Laporan Nilai Siswa ===")
     
     while True:
-        students = display_students()
+        siswa = display_students()
         
         try:
-            student_id = int(input("\nMasukkan ID siswa untuk melihat nilainya (atau 0 untuk keluar): "))
-            if student_id == 0:
+            nisn = input("\nMasukkan NISN siswa untuk melihat nilainya (atau 0 untuk keluar): ")
+            if nisn == "0":
                 print("Keluar dari sistem.")
                 break
 
-            student_ids = [student[0] for student in students]
-            if student_id in student_ids:
-                view_student_scores(student_id)
+            nisn_list = [str(s[2]) for s in siswa]  # Mengambil NISN dari daftar siswa
+            if nisn in nisn_list:
+                view_student_scores(nisn)
             else:
-                print("ID siswa tidak valid.")
+                print("NISN siswa tidak valid.")
         except ValueError:
-            print("Harap masukkan angka yang valid.")
+            print("Harap masukkan data yang valid.")
