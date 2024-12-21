@@ -97,9 +97,11 @@ def menu_siswa() :
 
     while True :
         print("\nSelamat Datang Di Menu Halaman Siswa")
+        print("="*30)
         print("1. Tambah Data Siswa")
         print("2. Lihat Data Siswa")
         print("3. Kembali Ke Menu Utama")
+        print("="*30)
         try :
             pilih = int(input("Silakan Pilih Menu : "))
             if pilih == 1 :
@@ -110,6 +112,6 @@ def menu_siswa() :
                 print("")
                 break
             else :
-                print("Pilihan Tidak Valid!")
+                print("Pilihan Tidak Valid !")
         except ValueError:
-            print("Input Harus Berupa Angka!")
+            print("Input Harus Berupa Angka !")

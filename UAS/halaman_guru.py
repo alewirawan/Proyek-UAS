@@ -63,7 +63,7 @@ def lihat_guru(cursor, conn) :
         print("")
     conn.close()
         
-def halaman_guru() :
+def menu_guru() :
     conn, cursor = koneksi()
     while True :
         print("Selamat Datang di Halaman Guru!")
