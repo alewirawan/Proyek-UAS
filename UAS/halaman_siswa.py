@@ -75,7 +75,7 @@ def edit_siswa():
             SET nama = ?, jenis_kelamin = ?, tanggal_lahir = ?, angkatan = ? 
             WHERE id = ?""", (nama_siswa, jk, tanggal_lahir, angkatan, id_siswa))
         conn.commit()
-
+        
         print("Data Setelah Pembaruan: ")
         cursor.execute("SELECT * FROM siswa WHERE id = ?", (id_siswa,))
         row = cursor.fetchone()
