@@ -24,7 +24,7 @@ def main() :
             elif pilih == 4 :
                 print("halaman_rapor_siswa")
             elif pilih == 0 :
-                print("Terimakasih !")
+                print("Terima kasih !")
                 break
             else :
                 print("Pilihan tidak valid. Coba lagi !")
