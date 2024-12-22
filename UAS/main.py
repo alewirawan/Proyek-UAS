@@ -1,7 +1,7 @@
 from halaman_siswa import menu_siswa
 from halaman_nilai import menu_nilai
 from halaman_guru import menu_guru
-
+from Halaman_rapor_siswa import menu
 
 def main() :
     while True :
