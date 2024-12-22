@@ -1,7 +1,7 @@
 from halaman_siswa import menu_siswa
 from halaman_nilai import menu_nilai
 from halaman_guru import menu_guru
-from Halaman_rapor_siswa import menu
+from Halaman_rapor_siswa import menu_rapor
 
 def main() :
     while True :
@@ -22,7 +22,7 @@ def main() :
             elif pilih == 3 :
                 menu_nilai()
             elif pilih == 4 :
-                print("halaman_rapor_siswa")
+                menu_rapor()
             elif pilih == 0 :
                 print("Terima kasih !")
                 break
