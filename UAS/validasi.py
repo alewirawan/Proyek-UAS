@@ -35,7 +35,7 @@ def nisn_ai(cursor) :
     if last_id is None :
         last_id = 0
     
-    nisn_auto = "241011"+ f"{last_id+1 :06d}"
+    nisn_auto = "241011"+ f"{last_id+1 :03d}"
     nisn = int(nisn_auto)
     return nisn
 

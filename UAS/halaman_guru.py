@@ -1,3 +1,4 @@
+from tabulate import tabulate
 import sqlite3
 
 def koneksi():
@@ -7,7 +8,7 @@ def koneksi():
     return conn, cursor
 
 def create_table(cursor):
-    cursor.execute('''
+    cursor.execute(''' 
         CREATE TABLE IF NOT EXISTS guru (
             id_guru INTEGER PRIMARY KEY AUTOINCREMENT,
             nama VARCHAR(40) UNIQUE,
@@ -56,32 +57,29 @@ def tambah_guru(cursor, conn):
 
 def lihat_guru(cursor):
     print("\nDaftar Guru")
-    print("-----------")
+    print("=" * 120)
     cursor.execute("SELECT * FROM guru")
     rows = cursor.fetchall()
     if rows:
-        print(f"{'ID':<5} {'Nama':<60} {'NIP':<15} {'Mata Pelajaran':<20}")
-        print("-" * 100)
-        for row in rows:
-            print(f"{row[0]:<5} {row[1]:<60} {row[2]:<15} {row[3]:<20}")
-        print("")
-    else:
+        headers = ["ID", "Nama", "NIP", "Mata Pelajaran"]
+        print(tabulate(rows, headers=headers, tablefmt="grid"))
+    else:   
         print("Data guru belum ditambahkan!\n")
 
 def menu_guru():
     conn, cursor = koneksi()
     try:
         while True:
-            print("Selamat Datang di Halaman Guru!")
-            print("-------------------------------")
+            print("\nSelamat Datang di Halaman Guru!")
+            print("=" * 30)
             print("Pilih Menu:")
             print("1. Tambah Data Guru Baru")
             print("2. Lihat Daftar Guru")
             print("3. Kembali ke Menu Utama")
-            print("-------------------------------")
+            print("=" * 30)
 
             try:
-                pilih = int(input("Pilih menu: "))
+                pilih = int(input("Silahkan Pilih Menu: "))
                 if pilih == 1:
                     tambah_guru(cursor, conn)
                 elif pilih == 2:

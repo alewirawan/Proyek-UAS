@@ -1,82 +1,100 @@
 import sqlite3
+from tabulate import tabulate
 
-def connect_database():
+
+def hubungkan_database():
     """Menghubungkan ke database SQLite."""
-    conn = sqlite3.connect("UAS.db")
-    return conn
+    koneksi = sqlite3.connect("UAS.db")
+    return koneksi
 
-def display_students():
-    """Menampilkan daftar siswa."""
-    conn = connect_database()
-    cursor = conn.cursor()
+
+def tampilkan_daftar_siswa():
+    """Menampilkan daftar seluruh siswa."""
+    koneksi = hubungkan_database()
+    kursor = koneksi.cursor()
 
     # Mengambil semua data siswa
-    cursor.execute("SELECT id, nama, nisn FROM siswa")
-    siswa = cursor.fetchall()
+    kursor.execute("SELECT id, nama, nisn FROM siswa")
+    daftar_siswa = kursor.fetchall()
 
-    conn.close()
+    koneksi.close()
 
     print("\n=== Daftar Siswa ===")
-    for s in siswa:
-        print(f"{s[0]}. {s[1]} (NISN: {s[2]})")
+    # Menggunakan tabulate untuk tampilan yang lebih rapi
+    headers = ["No", "Nama", "NISN"]
+    data_siswa = [[s[0], s[1], s[2]] for s in daftar_siswa]
+    print(tabulate(data_siswa, headers=headers, tablefmt="grid"))
 
-    return siswa
+    return daftar_siswa
 
-def view_student_scores(nisn):
+
+def lihat_nilai_siswa(nisn):
     """Menampilkan nilai siswa berdasarkan NISN."""
-    conn = connect_database()
-    cursor = conn.cursor()
+    koneksi = hubungkan_database()
+    kursor = koneksi.cursor()
 
     # Mengambil detail siswa
-    cursor.execute("SELECT nama, nisn FROM siswa WHERE nisn = ?", (nisn,))
-    student = cursor.fetchone()
-    
-    if not student:
-        print("Siswa tidak ditemukan.")
+    kursor.execute("SELECT nama, nisn FROM siswa WHERE nisn = ?", (nisn,))
+    siswa = kursor.fetchone()
+
+    if not siswa:
+        print("Data siswa tidak ditemukan.")
         return
 
-    nama, nisn = student
+    nama, nisn = siswa
 
     # Mengambil nilai siswa
-    cursor.execute("SELECT mapel, nilai FROM penilaian WHERE nisn = ?", (nisn,))
-    scores = cursor.fetchall()
+    kursor.execute("SELECT mapel, nilai FROM penilaian WHERE nisn = ?", (nisn,))
+    nilai_siswa = kursor.fetchall()
 
-    conn.close()
+    koneksi.close()
 
-    # Menampilkan nilai siswa
-    print("\n=== Laporan Nilai ===")
-    print(f"Nama        : {nama}")
-    print(f"NISN        : {nisn}")
-    print("\nMata Pelajaran dan Nilai:")
-    print("-------------------------")
+    # Menampilkan nilai siswa dengan format yang lebih rapi
+    print("\n=== Laporan Nilai Siswa ===")
+    print(f"Nama Siswa: {nama}")
+    print(f"NISN: {nisn}")
 
-    total_score = 0
-    for subject, score in scores:
-        print(f"{subject:<15} : {score}")
-        total_score += score
+    if not nilai_siswa:
+        print("\nBelum ada data nilai untuk siswa ini.")
+        return
 
-    average_score = total_score / len(scores) if scores else 0
-    print("\n-------------------------")
-    print(f"Total Nilai : {total_score}")
-    print(f"Rata-rata   : {average_score:.2f}")
-    print("========================\n")
+    print("\nDaftar Nilai:")
+    headers = ["Mata Pelajaran", "Nilai"]
+    print(tabulate(nilai_siswa, headers=headers, tablefmt="grid"))
 
-if __name__ == "__main__":
-    print("=== Sistem Laporan Nilai Siswa ===")
-    
+    # Menghitung statistik nilai
+    total_nilai = sum(nilai for _, nilai in nilai_siswa)
+    rata_rata = total_nilai / len(nilai_siswa)
+
+    print("\nRingkasan Nilai:")
+    print(f"Total Nilai    : {total_nilai}")
+    print(f"Rata-rata      : {rata_rata:.2f}")
+    print("=" * 40 + "\n")
+
+
+def menu_rapor():
+    print("=" * 40)
+    print("SISTEM INFORMASI NILAI SISWA")
+    print("=" * 40)
+
     while True:
-        siswa = display_students()
-        
         try:
-            nisn = input("\nMasukkan NISN siswa untuk melihat nilainya (atau 0 untuk keluar): ")
+            daftar_siswa = tampilkan_daftar_siswa()
+            nisn = input("\nMasukkan NISN siswa (0 untuk keluar): ")
             if nisn == "0":
-                print("Keluar dari sistem.")
+                print("\nTerima kasih telah menggunakan sistem ini.")
                 break
 
-            nisn_list = [str(s[2]) for s in siswa]  # Mengambil NISN dari daftar siswa
-            if nisn in nisn_list:
-                view_student_scores(nisn)
+            # Memeriksa apakah NISN valid
+            nisn_terdaftar = [str(s[2]) for s in daftar_siswa]
+            if nisn in nisn_terdaftar:
+                lihat_nilai_siswa(nisn)
             else:
-                print("NISN siswa tidak valid.")
-        except ValueError:
-            print("Harap masukkan data yang valid.")
+                print("NISN tidak terdaftar dalam sistem.")
+
+        except ValueError as e:
+            print(f"Terjadi kesalahan: {str(e)}")
+            print("Mohon masukkan data yang valid.")
+        except Exception as e:
+            print(f"Terjadi kesalahan sistem: {str(e)}")
+            print("Silakan coba lagi.")
