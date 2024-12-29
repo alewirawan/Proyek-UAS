@@ -37,9 +37,15 @@ def add_record():
             except ValueError:
                 print("NISN harus berupa angka. Silakan coba lagi.")
 
-        # Input mata pelajaran
-        mapel = input("Masukkan mata pelajaran: ")
+        # Validasi input mata pelajaran
+        while True:
+            mapel = input("Masukkan mata pelajaran: ").strip()
+            if mapel:  # Jika input tidak kosong
+                break
+            else:
+                print("Mata pelajaran tidak boleh kosong. Silakan coba lagi.")
 
+        # Validasi input nilai siswa
         while True:
             try:
                 nilai = float(input("Masukkan nilai siswa: "))
@@ -50,8 +56,8 @@ def add_record():
             except ValueError:
                 print("Nilai harus berupa angka desimal. Silakan coba lagi.")
 
-        cursor.execute("INSERT INTO penilaian (nisn, mapel, nilai) VALUES (?, ?, ?)",
-                       ( nisn, mapel, nilai))
+        # Menambahkan data ke tabel penilaian
+        cursor.execute("INSERT INTO penilaian (nisn, mapel, nilai) VALUES (?, ?, ?)", (nisn, mapel, nilai))
         conn.commit()
         print("Data berhasil ditambahkan.")
 
