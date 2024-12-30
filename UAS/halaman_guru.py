@@ -22,7 +22,6 @@ def connect_db():
     return conn, cursor
 
 def reset_autoincrement(cursor, conn):
-    # Fungsi untuk mengatur ulang ID setelah penghapusan
     cursor.execute("SELECT * FROM guru ORDER BY id_guru")
     rows = cursor.fetchall()
     
@@ -42,23 +41,35 @@ def reset_autoincrement(cursor, conn):
     cursor.execute("DROP TABLE temp_guru")
     conn.commit()
 
-def add_teacher(cursor, conn):
+def tambah_guru(cursor, conn):
     clear_screen()
     print("\n=== TAMBAH GURU ===")
     
     while True:
-        nama = input("Nama Guru : ").strip().upper()
+        nama = input("Nama Guru : ").strip()
+        
+        # Validasi nama hanya boleh huruf
+        if not nama.isalpha():
+            print("Nama hanya boleh terdiri dari huruf saja!")
+            continue
+        
         if not nama:
             print("Nama tidak boleh kosong!")
             continue
-            
+
+        # Cek apakah nama sudah ada dalam database
+        cursor.execute("SELECT * FROM guru WHERE nama = ?", (nama.upper(),))
+        if cursor.fetchone():
+            print("Nama guru sudah terdaftar! Coba dengan nama lain.")
+            continue
+        
         try:
             nip = int(input("NIP : "))
             mata_pelajaran = input("Mata Pelajaran : ").strip().upper()
             
             cursor.execute(
                 "INSERT INTO guru (nama, nip, mata_pelajaran) VALUES (?, ?, ?)",
-                (nama, nip, mata_pelajaran)
+                (nama.upper(), nip, mata_pelajaran)
             )
             conn.commit()
             print("\nData guru berhasil ditambahkan!")
@@ -70,7 +81,8 @@ def add_teacher(cursor, conn):
     
     input("\nTekan Enter untuk lanjut...")
 
-def view_teachers(cursor):
+
+def lihat_guru(cursor):
     cursor.execute("SELECT * FROM guru ORDER BY id_guru")
     rows = cursor.fetchall()
     
@@ -82,8 +94,8 @@ def view_teachers(cursor):
     
     input("\nTekan Enter untuk lanjut...")
 
-def update_teacher(cursor, conn):
-    view_teachers(cursor)
+def update_guru(cursor, conn):
+    lihat_guru(cursor)
     
     try:
         id_guru = int(input("\nMasukkan ID Guru yang ingin diedit: "))
@@ -111,8 +123,8 @@ def update_teacher(cursor, conn):
     
     input("\nTekan Enter untuk lanjut...")
 
-def delete_teacher(cursor, conn):
-    view_teachers(cursor)
+def hapus_guru(cursor, conn):
+    lihat_guru(cursor)
     
     try:
         id_guru = int(input("\nMasukkan ID Guru yang ingin dihapus: "))
@@ -134,36 +146,36 @@ def delete_teacher(cursor, conn):
     input("\nTekan Enter untuk lanjut...")
 
 def menu_guru():
-    conn, cursor = connect_db()  # Misalnya ini menghubungkan ke DB
+    conn, cursor = connect_db()  # Menghubungkan ke database
     
     while True:
         clear_screen()
         
-        # Tampilan Header dengan warna
-        print(warna_text("="*40, '1;34'))  # Biru terang
-        print(warna_text("           === MENU GURU ===   ", '1;34'))  # Biru terang
-        print(warna_text("="*40, '1;34'))  # Biru terang
+        # Tampilan Header 
+        print(warna_text("="*40, '1;34'))  
+        print(warna_text("           === MENU GURU ===   ", '1;34'))  
+        print(warna_text("="*40, '1;34'))  
         
-        # Tampilan Pilihan Menu dengan warna
-        print("\n" + warna_text("[1]", '1;32') + " Tambah Guru".ljust(25) + warna_text("[2]", '1;33') + " Lihat Guru".ljust(25))
-        print(warna_text("[3]", '1;36') + " Update Guru".ljust(25) + warna_text("[4]", '1;31') + " Hapus Guru".ljust(25))
-        print(warna_text("[0]", '1;35') + " Keluar".ljust(25))
+        # Tampilan Pilihan Menu dengan dua warna
+        print(warna_text("[1]", '1;31') + " Tambah Guru" + "    " + warna_text("[2]", '1;32') + " Lihat Guru")
+        print(warna_text("[3]", '1;31') + " Update Guru" + "   " + warna_text("[4]", '1;32') + " Hapus Guru")
+        print(warna_text("[0]", '1;31') + " Keluar")
         
         # Input Pilihan Menu
         menu = input("\nPilih menu (0-4): ")
         
         if menu == '1':
-            add_teacher(cursor, conn)
+            tambah_guru(cursor, conn)
         elif menu == '2':
-            view_teachers(cursor)
+            lihat_guru(cursor)
         elif menu == '3':
-            update_teacher(cursor, conn)
+            update_guru(cursor, conn)
         elif menu == '4':
-            delete_teacher(cursor, conn)
+            hapus_guru(cursor, conn)
         elif menu == '0':
-            print(warna_text("\nKeluar dari program...", '1;31'))  # Merah terang
+            print(warna_text("\nKeluar dari program...", '1;31'))
             conn.close()
             break
         else:
-            print(warna_text("\nMenu tidak valid!", '1;41'))  # Latar belakang merah dengan teks putih
+            print(warna_text("\nMenu tidak valid!", '1;41')) 
             input("Tekan Enter untuk lanjut...")
