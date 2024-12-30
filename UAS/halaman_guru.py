@@ -157,7 +157,7 @@ def menu_guru():
         print(warna_text("="*40, '1;34'))  
         
         # Tampilan Pilihan Menu dengan dua warna
-        print(warna_text("[1]", '1;31') + " Tambah Guru" + "    " + warna_text("[2]", '1;32') + " Lihat Guru")
+        print(warna_text("[1]", '1;31') + " Tambah Guru" + "   " + warna_text("[2]", '1;32') + " Lihat Guru")
         print(warna_text("[3]", '1;31') + " Update Guru" + "   " + warna_text("[4]", '1;32') + " Hapus Guru")
         print(warna_text("[0]", '1;31') + " Keluar")
         
