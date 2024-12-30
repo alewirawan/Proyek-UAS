@@ -34,7 +34,6 @@ def tambah_nilai():
                     print("NISN sudah terdaftar. Anda dapat melanjutkan.")
                     break
                 else:
-                    
                     print("NISN tidak terdaftar, coba lagi.")
             except ValueError:
                 print("NISN harus berupa angka. Silakan coba lagi.")
@@ -49,8 +48,12 @@ def tambah_nilai():
                 print("Mata pelajaran tidak boleh kosong. Silakan coba lagi.")
 =======
         # Input mata pelajaran
+<<<<<<< HEAD
         mapel = input("Masukkan mata pelajaran: ").strip()
 >>>>>>> c96476b8478970c1aff80d3d8e59a8bd6eb4ccbc
+=======
+        mapel = input("Masukkan mata pelajaran: ").strip().upper()
+>>>>>>> d499f778a80d4b93ee64809f588e6cfbae9119c0
 
         # Validasi input nilai siswa
         while True:
@@ -147,14 +150,16 @@ def hapus_nilai():
 def menu_nilai():
     create_table()
     while True:
-        print("\nMenu Penilaian Siswa:")
+        print("\nSelamat Datang Di Halaman Penilaian Siswa!")
+        print("="*50)
         print("1. Tambah Data")
         print("2. Tampilkan Data")
         print("3. Perbarui Data")
         print("4. Hapus Data")
-        print("5. Keluar")
+        print("0. Keluar")
+        print("="*50)
         
-        choice = input("Pilih menu (1-5): ")
+        choice = input("Pilih menu (1-5) : ")
         if choice == "1":
             tambah_nilai()
         elif choice == "2":
@@ -163,9 +168,8 @@ def menu_nilai():
             update_nilai()
         elif choice == "4":
             hapus_nilai()
-        elif choice == "5":
-            print("Keluar dari program. Sampai jumpa!")
+        elif choice == "0":
+            print("")
             break
         else:
             print("Pilihan tidak valid. Silakan coba lagi.")
-
