@@ -34,11 +34,11 @@ def banner():
 def tampilan_menu():
     print(warna_teks("|----------------------------------------------------|", '1;33'))  
     print(warna_teks("|----------------------------------------------------|", '1;33'))  
-    print(warna_teks("| [1] Halaman Siswa                                  |", '1;32')) 
-    print(warna_teks("| [2] Halaman Guru                                   |", '1;34')) 
-    print(warna_teks("| [3] Halaman Penilaian                              |", '1;36'))  
-    print(warna_teks("| [4] Halaman Rapor Siswa                            |", '1;35')) 
-    print(warna_teks("| [0] Keluar                                         |", '1;31'))  
+    print(warna_teks("| [1] Halaman Siswa                                  |", '1;33')) 
+    print(warna_teks("| [2] Halaman Guru                                   |", '1;33')) 
+    print(warna_teks("| [3] Halaman Penilaian                              |", '1;33'))  
+    print(warna_teks("| [4] Halaman Rapor Siswa                            |", '1;33')) 
+    print(warna_teks("| [0] Keluar                                         |", '1;33'))  
     print(warna_teks("|----------------------------------------------------|", '1;33'))  
 
 # Fungsi untuk animasi loading
