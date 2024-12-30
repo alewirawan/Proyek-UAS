@@ -38,7 +38,7 @@ def tambah_nilai():
             except ValueError:
                 print("NISN harus berupa angka. Silakan coba lagi.")
 
-<<<<<<< HEAD
+
         # Validasi input mata pelajaran
         while True:
             mapel = input("Masukkan mata pelajaran: ").strip()
@@ -46,14 +46,11 @@ def tambah_nilai():
                 break
             else:
                 print("Mata pelajaran tidak boleh kosong. Silakan coba lagi.")
-=======
+
         # Input mata pelajaran
-<<<<<<< HEAD
+
         mapel = input("Masukkan mata pelajaran: ").strip()
->>>>>>> c96476b8478970c1aff80d3d8e59a8bd6eb4ccbc
-=======
         mapel = input("Masukkan mata pelajaran: ").strip().upper()
->>>>>>> d499f778a80d4b93ee64809f588e6cfbae9119c0
 
         # Validasi input nilai siswa
         while True:
@@ -66,13 +63,8 @@ def tambah_nilai():
             except ValueError:
                 print("Nilai harus berupa angka desimal. Silakan coba lagi.")
 
-<<<<<<< HEAD
         # Menambahkan data ke tabel penilaian
         cursor.execute("INSERT INTO penilaian (nisn, mapel, nilai) VALUES (?, ?, ?)", (nisn, mapel, nilai))
-=======
-        cursor.execute("INSERT INTO penilaian (nisn, mapel, nilai) VALUES (?, ?, ?)",
-                    (nisn, mapel, nilai))
->>>>>>> c96476b8478970c1aff80d3d8e59a8bd6eb4ccbc
         conn.commit()
         print("Data berhasil ditambahkan.")
 
