@@ -74,20 +74,34 @@ def tambah_nilai():
         conn.close()
 
 # Fungsi untuk membaca data
+from tabulate import tabulate
+
 def lihat_nilai():
     conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM penilaian")
+    
+    # Query untuk menggabungkan tabel siswa dan penilaian berdasarkan NISN
+    cursor.execute("""
+        SELECT s.nama, p.nisn, p.mapel, p.nilai
+        FROM siswa s
+        JOIN penilaian p ON s.nisn = p.nisn
+        ORDER BY s.nama
+    """)
+    
     rows = cursor.fetchall()
     conn.close()
-    print("="*20)
+    
+    print("=" * 40)
     print("\nData Penilaian Siswa:\n")
-    print("="*20)
+    print("=" * 40)
+    
     if rows:
-        headers = ["No", "NISN", "Mapel", "Nilai"]
+        # Header yang mencakup nama siswa
+        headers = ["Nama Siswa", "NISN", "Mata Pelajaran", "Nilai"]
         print(tabulate(rows, headers=headers, tablefmt="grid"))
     else:
         print("Data nilai siswa belum ditambahkan!\n")
+
 
 # Fungsi untuk memperbarui data
 def update_nilai():
