@@ -25,6 +25,21 @@ def tambah_nilai():
     conn = create_connection()
     cursor = conn.cursor()
     try:
+    
+    # Ambil daftar nama siswa dan NISN
+        cursor.execute("SELECT nisn, nama FROM siswa ORDER BY nama")
+        siswa_list = cursor.fetchall()
+        
+        if not siswa_list:
+            print("Data siswa belum tersedia!")
+            conn.close()
+            return
+        
+        # Tampilkan daftar nama siswa
+        print("\nDaftar Siswa:")
+        headers = ["No", "NISN", "Nama Siswa"]
+        siswa_table = [(i + 1, siswa[0], siswa[1]) for i, siswa in enumerate(siswa_list)]
+        print(tabulate(siswa_table, headers=headers, tablefmt="grid"))
         # Validasi input NISN
         while True:
             try:
