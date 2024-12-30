@@ -122,7 +122,7 @@ def lihat_nilai():
     conn.close()
     
     # Tampilkan data nilai siswa
-    print(f"\nData Nilai untuk Siswa: {nama_terpilih} (NISN: {nisn_terpilih})")
+    print(f"\nData Nilai Siswa: {nama_terpilih} (NISN: {nisn_terpilih})")
     print("=" * 40)
     if rows:
         headers = ["Mata Pelajaran", "Nilai"]
@@ -185,10 +185,10 @@ def menu_nilai():
     while True:
         print("\nSelamat Datang Di Halaman Penilaian Siswa!")
         print("="*50)
-        print("1. Tambah Data")
-        print("2. Tampilkan Data")
-        print("3. Perbarui Data")
-        print("4. Hapus Data")
+        print("1. Tambahkan nilai siswa")
+        print("2. Tampilkan nilai siswa")
+        print("3. Perbarui nilai siswa")
+        print("4. Hapus nilai siswa")
         print("0. Keluar")
         print("="*50)
         
