@@ -80,28 +80,55 @@ def lihat_nilai():
     conn = create_connection()
     cursor = conn.cursor()
     
-    # Query untuk menggabungkan tabel siswa dan penilaian berdasarkan NISN
+    # Ambil daftar nama siswa dan NISN
+    cursor.execute("SELECT nisn, nama FROM siswa ORDER BY nama")
+    siswa_list = cursor.fetchall()
+    
+    if not siswa_list:
+        print("Data siswa belum tersedia!")
+        conn.close()
+        return
+    
+    # Tampilkan daftar nama siswa
+    print("\nDaftar Siswa:")
+    headers = ["No", "NISN", "Nama Siswa"]
+    siswa_table = [(i + 1, siswa[0], siswa[1]) for i, siswa in enumerate(siswa_list)]
+    print(tabulate(siswa_table, headers=headers, tablefmt="grid"))
+    
+    # Pilih siswa berdasarkan nomor
+    try:
+        pilihan = int(input("\nPilih nomor siswa untuk melihat nilai: "))
+        if pilihan < 1 or pilihan > len(siswa_list):
+            print("Nomor yang dipilih tidak valid!")
+            conn.close()
+            return
+        
+        nisn_terpilih = siswa_list[pilihan - 1][0]
+        nama_terpilih = siswa_list[pilihan - 1][1]
+    except ValueError:
+        print("Input harus berupa angka!")
+        conn.close()
+        return
+    
+    # Ambil data nilai berdasarkan NISN
     cursor.execute("""
-        SELECT s.nama, p.nisn, p.mapel, p.nilai
-        FROM siswa s
-        JOIN penilaian p ON s.nisn = p.nisn
-        ORDER BY s.nama
-    """)
+        SELECT p.mapel, p.nilai
+        FROM penilaian p
+        WHERE p.nisn = ?
+        ORDER BY p.mapel
+    """, (nisn_terpilih,))
     
     rows = cursor.fetchall()
     conn.close()
     
+    # Tampilkan data nilai siswa
+    print(f"\nData Nilai untuk Siswa: {nama_terpilih} (NISN: {nisn_terpilih})")
     print("=" * 40)
-    print("\nData Penilaian Siswa:\n")
-    print("=" * 40)
-    
     if rows:
-        # Header yang mencakup nama siswa
-        headers = ["Nama Siswa", "NISN", "Mata Pelajaran", "Nilai"]
+        headers = ["Mata Pelajaran", "Nilai"]
         print(tabulate(rows, headers=headers, tablefmt="grid"))
     else:
         print("Data nilai siswa belum ditambahkan!\n")
-
 
 # Fungsi untuk memperbarui data
 def update_nilai():
