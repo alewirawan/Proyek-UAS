@@ -61,12 +61,6 @@ def tambah_nilai():
                 break
             else:
                 print("Mata pelajaran tidak boleh kosong. Silakan coba lagi.")
-
-        # Input mata pelajaran
-
-        mapel = input("Masukkan mata pelajaran: ").strip()
-        mapel = input("Masukkan mata pelajaran: ").strip().upper()
-
         # Validasi input nilai siswa
         while True:
             try:
