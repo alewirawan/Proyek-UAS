@@ -2,7 +2,7 @@
 
 ==================================================
 
-## Sistem Informasi Pengolahan Data Nilai Siswa
+## Sistem Aplikasi Pengolahan Data Nilai Siswa
 
 ### KELOMPOK
 
