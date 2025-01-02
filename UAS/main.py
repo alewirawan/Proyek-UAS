@@ -57,7 +57,7 @@ def main():
         banner()
         tampilan_menu()
         try:
-            pilih = input(warna_teks("Silahkan Pilih Menu 0-4]: ", '1;32'))  
+            pilih = input(warna_teks("➤ Silahkan Pilih Menu 0-4]: ", '1;32'))  
 
             if pilih in ["0", "1", "2", "3", "4"]:
                 animasi_load()
