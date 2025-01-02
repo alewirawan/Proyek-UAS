@@ -1,223 +1,244 @@
 import sqlite3
 from tabulate import tabulate
 
-# Fungsi untuk membuat koneksi ke database
-def create_connection():
-    return sqlite3.connect("UAS.db")
+# Utilities
+def warna_teks(teks, kode_warna): return f"\033[{kode_warna}m{teks}\033[0m"
+def create_connection(): return sqlite3.connect("UAS.db")
 
-# Fungsi untuk membuat tabel siswa dan penilaian
-def create_tables():
-    conn = create_connection()
-    cursor = conn.cursor()
-    try:
-        # Tabel siswa
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS siswa (
-            nisn INTEGER PRIMARY KEY,
-            nama TEXT NOT NULL
-        );
+# Database initialization
+def create_table():
+    with create_connection() as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS penilaian (
+                no INTEGER PRIMARY KEY AUTOINCREMENT,
+                nisn INTEGER NOT NULL,
+                mapel TEXT NOT NULL,
+                nilai REAL NOT NULL CHECK(nilai >= 0 AND nilai <= 100),
+                FOREIGN KEY (nisn) REFERENCES siswa (nisn)
+            )
         """)
 
-        # Tabel penilaian
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS penilaian (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nisn INTEGER NOT NULL,
-            mapel TEXT NOT NULL,
-            nilai REAL NOT NULL,
-            FOREIGN KEY (nisn) REFERENCES siswa(nisn),
-            UNIQUE (nisn, mapel)
-        );
-        """)
-        conn.commit()
-        print("Tabel berhasil dibuat.")
-    except sqlite3.Error as e:
-        print(f"Database Error: {e}")
-    finally:
-        conn.close()
+# Constants
+MAPEL_LIST = ["Matematika", "Kimia", "Fisika", "Pendidikan Pancasila", "Bahasa Inggris"]
 
-# Fungsi untuk menambahkan nilai
-def tambah_nilai():
-    conn = create_connection()
-    cursor = conn.cursor()
-    try:
-        # Ambil daftar siswa
-        cursor.execute("SELECT nisn, nama FROM siswa ORDER BY nama")
-        siswa_list = cursor.fetchall()
+def get_siswa_list(cursor):
+    cursor.execute("SELECT nisn, nama FROM siswa ORDER BY nama")
+    return cursor.fetchall()
 
-        if not siswa_list:
-            print("Data siswa belum tersedia!")
-            return
+def display_siswa(siswa_list):
+    print(warna_teks("\nDaftar Siswa:", "34"))
+    headers = ["No", "NISN", "Nama Siswa"]
+    siswa_table = [(i+1, siswa[0], siswa[1]) for i, siswa in enumerate(siswa_list)]
+    print(tabulate(siswa_table, headers=headers, tablefmt="grid"))
 
-        # Tampilkan daftar siswa
-        print("\nDaftar Siswa:")
-        headers = ["No", "NISN", "Nama Siswa"]
-        siswa_table = [(i + 1, siswa[0], siswa[1]) for i, siswa in enumerate(siswa_list)]
-        print(tabulate(siswa_table, headers=headers, tablefmt="grid"))
-
-        # Input NISN siswa
-        while True:
-            try:
-                nisn = int(input("\nMasukkan NISN siswa: "))
-                if any(s[0] == nisn for s in siswa_list):
-                    break
-                else:
-                    print("NISN tidak terdaftar! Silakan coba lagi.")
-            except ValueError:
-                print("NISN harus berupa angka. Silakan coba lagi.")
-
-        # Input mata pelajaran
-        while True:
-            mapel = input("Masukkan mata pelajaran: ").strip()
-            if mapel:
-                break
-            else:
-                print("Mata pelajaran tidak boleh kosong!")
-
-        # Input nilai
-        while True:
-            try:
-                nilai = float(input("Masukkan nilai (0-100): "))
-                if 0 <= nilai <= 100:
-                    break
-                else:
-                    print("Nilai harus antara 0 dan 100.")
-            except ValueError:
-                print("Nilai harus berupa angka.")
-
-        # Tambahkan nilai ke tabel
-        cursor.execute("INSERT INTO penilaian (nisn, mapel, nilai) VALUES (?, ?, ?)", (nisn, mapel, nilai))
-        conn.commit()
-        print("Data nilai berhasil ditambahkan.")
-    except sqlite3.IntegrityError:
-        print("Data nilai sudah ada untuk siswa ini.")
-    except sqlite3.Error as e:
-        print(f"Database Error: {e}")
-    finally:
-        conn.close()
-
-# Fungsi untuk melihat nilai
-def lihat_nilai():
-    conn = create_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("SELECT nisn, nama FROM siswa ORDER BY nama")
-        siswa_list = cursor.fetchall()
-
-        if not siswa_list:
-            print("Data siswa belum tersedia!")
-            return
-
-        # Tampilkan daftar siswa
-        print("\nDaftar Siswa:")
-        headers = ["No", "NISN", "Nama Siswa"]
-        siswa_table = [(i + 1, siswa[0], siswa[1]) for i, siswa in enumerate(siswa_list)]
-        print(tabulate(siswa_table, headers=headers, tablefmt="grid"))
-
-        # Pilih siswa
-        while True:
-            try:
-                pilihan = int(input("\nPilih nomor siswa untuk melihat nilai: "))
-                if 1 <= pilihan <= len(siswa_list):
-                    nisn_terpilih = siswa_list[pilihan - 1][0]
-                    nama_terpilih = siswa_list[pilihan - 1][1]
-                    break
-                else:
-                    print("Pilihan tidak valid!")
-            except ValueError:
-                print("Input harus berupa angka.")
-
-        # Ambil data nilai
-        cursor.execute("SELECT mapel, nilai FROM penilaian WHERE nisn = ? ORDER BY mapel", (nisn_terpilih,))
-        nilai_list = cursor.fetchall()
-
-        # Tampilkan nilai siswa
-        print(f"\nData Nilai Siswa: {nama_terpilih} (NISN: {nisn_terpilih})")
-        if nilai_list:
-            print(tabulate(nilai_list, headers=["Mata Pelajaran", "Nilai"], tablefmt="grid"))
-        else:
-            print("Data nilai belum tersedia.")
-    except sqlite3.Error as e:
-        print(f"Database Error: {e}")
-    finally:
-        conn.close()
-
-# Fungsi untuk memperbarui nilai
-def update_nilai():
-    conn = create_connection()
-    cursor = conn.cursor()
-    try:
-        lihat_nilai()
-
-        # Input ID untuk diperbarui
-        id_nilai = int(input("Masukkan ID nilai yang akan diperbarui: "))
-        mapel = input("Mata pelajaran baru: ").strip() or None
-        nilai = input("Nilai baru: ").strip()
-        nilai = float(nilai) if nilai else None
-
-        query = "UPDATE penilaian SET "
-        params = []
-        if mapel:
-            query += "mapel = ?, "
-            params.append(mapel)
-        if nilai is not None:
-            query += "nilai = ?, "
-            params.append(nilai)
-        query = query.rstrip(", ") + " WHERE id = ?"
-        params.append(id_nilai)
-
-        cursor.execute(query, params)
-        conn.commit()
-        print("Data berhasil diperbarui.")
-    except sqlite3.Error as e:
-        print(f"Database Error: {e}")
-    finally:
-        conn.close()
-
-# Fungsi untuk menghapus nilai
-def hapus_nilai():
-    conn = create_connection()
-    cursor = conn.cursor()
-    try:
-        lihat_nilai()
-
-        # Input ID untuk dihapus
-        id_nilai = int(input("Masukkan ID nilai yang akan dihapus: "))
-        cursor.execute("DELETE FROM penilaian WHERE id = ?", (id_nilai,))
-        conn.commit()
-        print("Data berhasil dihapus.")
-    except sqlite3.Error as e:
-        print(f"Database Error: {e}")
-    finally:
-        conn.close()
-
-# Menu utama
-def menu_nilai():
-    create_tables()
+def validate_input(prompt, min_val, max_val, error_msg):
     while True:
-        print("\nMenu Penilaian Siswa")
-        print("=" * 50)
-        print("1. Tambahkan nilai siswa")
-        print("2. Tampilkan nilai siswa")
-        print("3. Perbarui nilai siswa")
-        print("4. Hapus nilai siswa")
-        print("0. Keluar")
-        print("=" * 50)
+        try:
+            value = float(input(warna_teks(prompt, "33")))
+            if min_val <= value <= max_val:
+                return value
+            print(warna_teks(error_msg, "31"))
+        except ValueError:
+            print(warna_teks("Input harus berupa angka!", "31"))
 
-        choice = input("Pilih menu (0-4): ")
-        if choice == "1":
-            tambah_nilai()
-        elif choice == "2":
-            lihat_nilai()
-        elif choice == "3":
-            update_nilai()
-        elif choice == "4":
-            hapus_nilai()
-        elif choice == "0":
-            print("Terima kasih!")
+def tambah_nilai():
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        siswa_list = get_siswa_list(cursor)
+        
+        if not siswa_list:
+            print(warna_teks("Data siswa belum tersedia!", "31"))
+            return
+            
+        display_siswa(siswa_list)
+        
+        # Input NISN
+        while True:
+            try:
+                nisn = int(input(warna_teks("Masukkan NISN: ", "33")))
+                if cursor.execute("SELECT COUNT(*) FROM siswa WHERE nisn = ?", (nisn,)).fetchone()[0]:
+                    break
+                print(warna_teks("NISN tidak terdaftar, coba lagi.", "31"))
+            except ValueError:
+                print(warna_teks("NISN harus berupa angka.", "31"))
+        
+        # Pilih mapel
+        print(warna_teks("\nPilih Mata Pelajaran:", "34"))
+        for i, mapel in enumerate(MAPEL_LIST, 1):
+            print(warna_teks(f"{i}. {mapel}", "36"))
+            
+        while True:
+            try:
+                pilihan_mapel = int(input(warna_teks("Pilih nomor mata pelajaran: ", "33")))
+                if 1 <= pilihan_mapel <= len(MAPEL_LIST):
+                    mapel = MAPEL_LIST[pilihan_mapel - 1]
+                    if not cursor.execute("SELECT COUNT(*) FROM penilaian WHERE nisn = ? AND mapel = ?", 
+                                        (nisn, mapel)).fetchone()[0]:
+                        break
+                print(warna_teks("Pilihan tidak valid atau nilai sudah ada.", "31"))
+            except ValueError:
+                print(warna_teks("Input harus berupa angka.", "31"))
+        
+        # Input nilai
+        nilai = validate_input("Masukkan nilai siswa: ", 0, 100, 
+                             "Nilai harus antara 0 dan 100.")
+        
+        cursor.execute("INSERT INTO penilaian (nisn, mapel, nilai) VALUES (?, ?, ?)",
+                      (nisn, mapel, nilai))
+        print(warna_teks("Data berhasil ditambahkan.", "32"))
+
+def lihat_nilai():
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        siswa_list = get_siswa_list(cursor)
+        
+        if not siswa_list:
+            print(warna_teks("Data siswa belum tersedia!", "31"))
+            return
+            
+        display_siswa(siswa_list)
+        
+        try:
+            pilihan = int(input(warna_teks("\nPilih nomor siswa untuk melihat nilai: ", "33")))
+            if not (1 <= pilihan <= len(siswa_list)):
+                print(warna_teks("Nomor tidak valid!", "31"))
+                return
+                
+            nisn, nama = siswa_list[pilihan - 1]
+            rows = cursor.execute("""
+                SELECT mapel, nilai FROM penilaian 
+                WHERE nisn = ? ORDER BY mapel
+            """, (nisn,)).fetchall()
+            
+            print(warna_teks(f"\nData Nilai Siswa: {nama} (NISN: {nisn})", "34"))
+            print(warna_teks("=" * 40, "36"))
+            
+            if rows:
+                print(tabulate(rows, ["Mata Pelajaran", "Nilai"], tablefmt="grid"))
+            else:
+                print(warna_teks("Data nilai siswa belum ditambahkan!\n", "31"))
+                
+        except ValueError:
+            print(warna_teks("Input harus berupa angka!", "31"))
+
+def update_nilai():
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        data_nilai = cursor.execute("""
+            SELECT p.no, s.nisn, s.nama, p.mapel, p.nilai
+            FROM siswa s JOIN penilaian p ON s.nisn = p.nisn
+            ORDER BY s.nama, p.mapel
+        """).fetchall()
+        
+        if not data_nilai:
+            print(warna_teks("Belum ada data nilai.", "31"))
+            return
+            
+        print(warna_teks("\nDaftar Nilai Siswa:", "34"))
+        headers = ["No", "NISN", "Nama", "Mata Pelajaran", "Nilai"]
+        print(tabulate([(i, *row[1:]) for i, row in enumerate(data_nilai, 1)], 
+                      headers, tablefmt="grid"))
+        
+        try:
+            pilihan = input(warna_teks("\nMasukkan nomor urut data yang ingin diubah (0 untuk batal): ", "33"))
+            if pilihan == '0':
+                print(warna_teks("Pembaruan dibatalkan.", "33"))
+                return
+                
+            pilihan = int(pilihan)
+            if not (1 <= pilihan <= len(data_nilai)):
+                print(warna_teks("Nomor urut tidak valid.", "31"))
+                return
+                
+            data = data_nilai[pilihan-1]
+            print(warna_teks(f"\nMengubah nilai:\nNISN: {data[1]}\nNama: {data[2]}\n"
+                           f"Mata Pelajaran: {data[3]}\nNilai Saat Ini: {data[4]}", "36"))
+            
+            nilai_baru = validate_input("\nMasukkan nilai baru (0-100): ", 0, 100,
+                                      "Nilai harus antara 0-100")
+            
+            if input(warna_teks(f"Yakin mengubah nilai menjadi {nilai_baru}? (y/n): ", "33")).lower() == 'y':
+                cursor.execute("UPDATE penilaian SET nilai = ? WHERE no = ?", 
+                             (nilai_baru, data[0]))
+                print(warna_teks("\nNilai berhasil diperbarui!", "32"))
+            else:
+                print(warna_teks("Pembaruan dibatalkan.", "33"))
+                
+        except ValueError:
+            print(warna_teks("Input tidak valid.", "31"))
+
+def hapus_nilai():
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        data_nilai = cursor.execute("""
+            SELECT p.no, s.nisn, s.nama, p.mapel, p.nilai
+            FROM siswa s JOIN penilaian p ON s.nisn = p.nisn
+            ORDER BY s.nama, p.mapel
+        """).fetchall()
+        
+        if not data_nilai:
+            print(warna_teks("Belum ada data nilai.", "31"))
+            return
+            
+        print(warna_teks("\nDaftar Nilai Siswa:", "34"))
+        print(tabulate(data_nilai, ["No", "NISN", "Nama", "Mata Pelajaran", "Nilai"], 
+                      tablefmt="grid"))
+        
+        try:
+            no_nilai = input(warna_teks("\nMasukkan nomor data yang ingin dihapus (0 untuk batal): ", "33"))
+            if no_nilai == "0":
+                print(warna_teks("Penghapusan dibatalkan.", "33"))
+                return
+                
+            no_nilai = int(no_nilai)
+            nilai = cursor.execute("""
+                SELECT s.nama, p.mapel, p.nilai FROM siswa s
+                JOIN penilaian p ON s.nisn = p.nisn WHERE p.no = ?
+            """, (no_nilai,)).fetchone()
+            
+            if not nilai:
+                print(warna_teks("Nomor data tidak ditemukan.", "31"))
+                return
+                
+            print(warna_teks(f"\nMenghapus nilai:\nNama: {nilai[0]}\n"
+                           f"Mata Pelajaran: {nilai[1]}\nNilai: {nilai[2]}", "36"))
+            
+            if input(warna_teks("Yakin menghapus data ini? (y/n): ", "33")).lower() == 'y':
+                cursor.execute("DELETE FROM penilaian WHERE no = ?", (no_nilai,))
+                print(warna_teks("\nData nilai berhasil dihapus!", "32"))
+            else:
+                print(warna_teks("Penghapusan dibatalkan.", "33"))
+                
+        except ValueError:
+            print(warna_teks("Input tidak valid.", "31"))
+
+def menu_nilai():
+    create_table()
+    while True:
+        print(warna_teks("=" * 40, "34"))
+        print(warna_teks("Selamat Datang Di Halaman Penilaian Siswa!", "36"))
+        print(warna_teks("=" * 40, "34"))
+        print("=" * 50)
+        
+        menu_options = {
+            "1": ("Tambahkan nilai siswa", tambah_nilai, "32"),
+            "2": ("Tampilkan nilai siswa", lihat_nilai, "34"),
+            "3": ("Perbarui nilai siswa", update_nilai, "33"),
+            "4": ("Hapus nilai siswa", hapus_nilai, "31"),
+            "0": ("Keluar", None, "35")
+        }
+        
+        for key, (text, _, color) in menu_options.items():
+            print(warna_teks(f"{key}. {text}", color))
+        print("=" * 50)
+        
+        pilihan = input(warna_teks("➤ Pilih menu (1-4): ", "36"))
+        if pilihan == "0":
             break
+        elif pilihan in menu_options:
+            menu_options[pilihan][1]()
         else:
-            print("Pilihan tidak valid.")
+            print(warna_teks("❗ Pilihan tidak valid. Silakan coba lagi.", "31"))
 
-# Jalankan menu
-menu_nilai()
+if __name__ == "__main__":
+    menu_nilai()
