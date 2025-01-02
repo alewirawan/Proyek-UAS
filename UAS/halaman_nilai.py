@@ -158,6 +158,7 @@ def update_nilai():
             for i, (no, nisn, nama, mapel, nilai) in enumerate(data_nilai, 1)
         ]
         print(tabulate(table_color, headers=headers, tablefmt="double_grid"))
+
         
         try:
             pilihan = input(warna_teks("\nMasukkan nomor urut data yang ingin diubah (0 untuk batal): ", "33"))
@@ -217,6 +218,7 @@ def hapus_nilai():
             for i, (no, nisn, nama, mapel, nilai) in enumerate(data_nilai, 1)
         ]
         print(tabulate(table_color, headers=headers, tablefmt="double_grid"))
+
         
         try:
             no_nilai = input(warna_teks("\nMasukkan nomor data yang ingin dihapus (0 untuk batal): ", "33"))
