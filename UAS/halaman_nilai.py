@@ -25,21 +25,30 @@ def get_siswa_list(cursor):
     cursor.execute("SELECT nisn, nama FROM siswa ORDER BY nama")
     return cursor.fetchall()
 
-def display_siswa(siswa_list):
-    print(warna_teks("\nDaftar Siswa:", "34"))
-    headers = ["No", "NISN", "Nama Siswa"]
-    siswa_table = [(i+1, siswa[0], siswa[1]) for i, siswa in enumerate(siswa_list)]
-    print(tabulate(siswa_table, headers=headers, tablefmt="grid"))
+def tampilkan_siswa(daftar_siswa):
+    print(warna_teks("\nDaftar Siswa:", "1;32"))
+    headers = [
+        warna_teks("No", "1;33"),
+        warna_teks("NISN", "1;33"),
+        warna_teks("Nama Siswa", "1;33")
+    ]
+    tabel_siswa = [
+        [warna_teks(str(i + 1), "1;37"), warna_teks(siswa[0], "1;37"), warna_teks(siswa[1], "1;37")]
+        for i, siswa in enumerate(daftar_siswa)
+    ]
+    print(tabulate(tabel_siswa, headers=headers, tablefmt="double_grid"))
 
-def validate_input(prompt, min_val, max_val, error_msg):
+def validasi_input(prompt, nilai_min, nilai_maks, pesan_error):
+ 
     while True:
         try:
-            value = float(input(warna_teks(prompt, "33")))
-            if min_val <= value <= max_val:
-                return value
-            print(warna_teks(error_msg, "31"))
+            nilai = float(input(warna_teks(prompt, "33")))
+            if nilai_min <= nilai <= nilai_maks:
+                return nilai
+            print(warna_teks(pesan_error, "31"))
         except ValueError:
             print(warna_teks("Input harus berupa angka!", "31"))
+
 
 def tambah_nilai():
     with create_connection() as conn:
@@ -50,7 +59,7 @@ def tambah_nilai():
             print(warna_teks("Data siswa belum tersedia!", "31"))
             return
             
-        display_siswa(siswa_list)
+        tampilkan_siswa(siswa_list)
         
         # Input NISN
         while True:
@@ -80,7 +89,7 @@ def tambah_nilai():
                 print(warna_teks("Input harus berupa angka.", "31"))
         
         # Input nilai
-        nilai = validate_input("Masukkan nilai siswa: ", 0, 100, 
+        nilai = validasi_input("Masukkan nilai siswa: ", 0, 100, 
                              "Nilai harus antara 0 dan 100.")
         
         cursor.execute("INSERT INTO penilaian (nisn, mapel, nilai) VALUES (?, ?, ?)",
@@ -96,7 +105,7 @@ def lihat_nilai():
             print(warna_teks("Data siswa belum tersedia!", "31"))
             return
             
-        display_siswa(siswa_list)
+        tampilkan_siswa(siswa_list)
         
         try:
             pilihan = int(input(warna_teks("\nPilih nomor siswa untuk melihat nilai: ", "33")))
@@ -114,7 +123,7 @@ def lihat_nilai():
             print(warna_teks("=" * 40, "36"))
             
             if rows:
-                print(tabulate(rows, ["Mata Pelajaran", "Nilai"], tablefmt="grid"))
+                print(tabulate(rows, ["Mata Pelajaran", "Nilai"], tablefmt="double_grid"))
             else:
                 print(warna_teks("Data nilai siswa belum ditambahkan!\n", "31"))
                 
@@ -131,13 +140,27 @@ def update_nilai():
         """).fetchall()
         
         if not data_nilai:
-            print(warna_teks("Belum ada data nilai.", "31"))
+            print(warna_teks("Belum ada data nilai.", "1;33"))
             return
             
         print(warna_teks("\nDaftar Nilai Siswa:", "34"))
-        headers = ["No", "NISN", "Nama", "Mata Pelajaran", "Nilai"]
-        print(tabulate([(i, *row[1:]) for i, row in enumerate(data_nilai, 1)], 
-                      headers, tablefmt="grid"))
+        headers = [warna_teks("No", "1;33"),
+                    warna_teks("NISN", "1;33"),
+                    warna_teks("Nama", "1;33"),
+                    warna_teks ("Mata Pelajaran", "1;33"),
+                    warna_teks("Nilai", "1;33")]
+        table_color = [
+            [
+                warna_teks(str(i), "1;37"),
+                warna_teks(nisn, "1;37"),
+                warna_teks(nama, "1;37"),
+                warna_teks(mapel, "1;37"),
+                warna_teks(str(nilai), "1;37")
+            ]
+            for i, (no, nisn, nama, mapel, nilai) in enumerate(data_nilai, 1)
+        ]
+        print(tabulate(table_color, headers=headers, tablefmt="double_grid"))
+
         
         try:
             pilihan = input(warna_teks("\nMasukkan nomor urut data yang ingin diubah (0 untuk batal): ", "33"))
@@ -154,7 +177,7 @@ def update_nilai():
             print(warna_teks(f"\nMengubah nilai:\nNISN: {data[1]}\nNama: {data[2]}\n"
                            f"Mata Pelajaran: {data[3]}\nNilai Saat Ini: {data[4]}", "36"))
             
-            nilai_baru = validate_input("\nMasukkan nilai baru (0-100): ", 0, 100,
+            nilai_baru = tampilkan_siswa("\nMasukkan nilai baru (0-100): ", 0, 100,
                                       "Nilai harus antara 0-100")
             
             if input(warna_teks(f"Yakin mengubah nilai menjadi {nilai_baru}? (y/n): ", "33")).lower() == 'y':
@@ -181,8 +204,23 @@ def hapus_nilai():
             return
             
         print(warna_teks("\nDaftar Nilai Siswa:", "34"))
-        print(tabulate(data_nilai, ["No", "NISN", "Nama", "Mata Pelajaran", "Nilai"], 
-                      tablefmt="grid"))
+        headers = [warna_teks("No", "1;33"),
+                    warna_teks("NISN", "1;33"),
+                    warna_teks("Nama", "1;33"),
+                    warna_teks ("Mata Pelajaran", "1;33"),
+                    warna_teks("Nilai", "1;33")]
+        table_color = [
+            [
+                warna_teks(str(i), "1;37"),
+                warna_teks(nisn, "1;37"),
+                warna_teks(nama, "1;37"),
+                warna_teks(mapel, "1;37"),
+                warna_teks(str(nilai), "1;37")
+            ]
+            for i, (no, nisn, nama, mapel, nilai) in enumerate(data_nilai, 1)
+        ]
+        print(tabulate(table_color, headers=headers, tablefmt="double_grid"))
+
         
         try:
             no_nilai = input(warna_teks("\nMasukkan nomor data yang ingin dihapus (0 untuk batal): ", "33"))
