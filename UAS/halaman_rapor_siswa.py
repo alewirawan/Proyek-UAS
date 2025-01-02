@@ -67,11 +67,11 @@ def lihat_nilai_siswa(nisn):
     print(tabulate(table_color, headers=headers, tablefmt="double_grid"))
 
     total_nilai = sum(nilai for _, nilai in nilai_siswa)
-    rata_rata = total_nilai / len(nilai_siswa)
+    rata_rata = total_nilai / len(nilai_siswa)  # Menghitung rata-rata
 
     print(warna_teks("\nRingkasan Nilai:", "1;35"))
-    print(warna_teks(f"Total Nilai    : {total_nilai}", "1;37"))
-    print(warna_teks(f"Rata-rata      : {rata_rata:.2f}", "1;37"))
+    print(warna_teks(f"Total Nilai    : {total_nilai}", "1;37"))  # Menampilkan total nilai
+    print(warna_teks(f"Rata-rata      : {rata_rata:.2f}", "1;37")) 
     print(warna_teks("=" * 40, "1;36"))
 
 

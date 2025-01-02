@@ -177,8 +177,7 @@ def update_nilai():
             print(warna_teks(f"\nMengubah nilai:\nNISN: {data[1]}\nNama: {data[2]}\n"
                            f"Mata Pelajaran: {data[3]}\nNilai Saat Ini: {data[4]}", "36"))
             
-            nilai_baru = tampilkan_siswa("\nMasukkan nilai baru (0-100): ", 0, 100,
-                                      "Nilai harus antara 0-100")
+            nilai_baru = validasi_input("\nMasukkan nilai baru (0-100): ", 0, 100, "Nilai harus antara 0-100")
             
             if input(warna_teks(f"Yakin mengubah nilai menjadi {nilai_baru}? (y/n): ", "33")).lower() == 'y':
                 cursor.execute("UPDATE penilaian SET nilai = ? WHERE no = ?", 
@@ -277,6 +276,3 @@ def menu_nilai():
             menu_options[pilihan][1]()
         else:
             print(warna_teks("❗ Pilihan tidak valid. Silakan coba lagi.", "31"))
-
-if __name__ == "__main__":
-    menu_nilai()
